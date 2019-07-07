@@ -1,0 +1,24 @@
+<h2>Profile</h2>
+{{!-- {{#if user.facebookId}}
+<p>Facebook Id: {{user.facebookId}}</p>
+{{/if}}
+{{#if user.githubId}}
+<p>github Id: {{user.githubId}}</p>
+{{/if}} --}}
+
+<div>
+  <form action="/update" method="post">
+    <h4><a href="/protected/user/{{user._id}}"></a></h4>
+    <input type="text" name="username" value="{{user.username}}"/>
+
+        <p>{{user.role}}</p>
+      <select name="role" id="">
+
+      {{!-- {{#select user.role}} --}}
+        <option value="Boss"      {{#if optionASelected}} selected {{/if}}>Boss</option>
+        <option value="TA"        {{#if optionBSelected}} selected {{/if}}>TA</option>
+        <option value="Developer" {{#if optionCSelected}} selected {{/if}}>Developer</option>
+      {{!-- {{/select}} --}}
+    </select>
+  </form>
+</div>

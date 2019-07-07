@@ -1,0 +1,26 @@
+<div id="container"></div>
+  {{!-- <form action="/signup" method="POST">
+    <label for="username">Username:</label>
+    <input type="text" name="username" />
+    <label for="password">Password:</label>
+    <input type="password" name="password">
+    <select name="role" id="">
+      <option value="Boss">Boss</option>
+      <option value="TA">TA</option>
+      <option value="Developer">Developer</option>
+    </select>
+    <button type="submit">Create</button>
+  </form> --}}
+  {{#each users}}
+      <div>
+          <h4><a href="/user/{{_id}}">{{username}}</a>
+              <p>{{role}}</p>
+          </h4>
+      </div>
+  {{/each}}
+</div>
+
+<a href="/profile">View/edit profile</a><br />
+{{#if user}}
+<a href="/signup">Create new User</a>
+{{/if}}

@@ -1,14 +1,19 @@
 require('dotenv').config();
 
-const bodyParser   = require('body-parser');
-const cookieParser = require('cookie-parser');
-const express      = require('express');
-const favicon      = require('serve-favicon');
-const hbs          = require('hbs');
-const mongoose     = require('mongoose');
-const logger       = require('morgan');
-const path         = require('path');
-
+const bodyParser        = require('body-parser');
+const cookieParser      = require('cookie-parser');
+const express           = require('express');
+const favicon           = require('serve-favicon');
+const hbs               = require('hbs');
+const mongoose          = require('mongoose');
+const logger            = require('morgan');
+const path              = require('path');
+const bcrypt            = require("bcrypt");
+const flash             = require('connect-flash');
+const passport          = require('passport');
+const LocalStrategy     = require('passport-local').Strategy;
+const User              = require("./models/user");
+const session           = require("express-session");
 
 mongoose
   .connect('mongodb://localhost/starter-code', {useNewUrlParser: true})
@@ -29,6 +34,49 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    cookie: { maxAge: 24 * 60 * 60 },
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
+app.use(flash());
+
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id)
+    .then(user => {
+      done(null, user);
+    })
+    .catch(err => {
+      done(err);
+    });
+});
+
+passport.use(
+  new LocalStrategy((username, password, done) => {
+    User.findOne({ username: username })
+      .then(user => {
+        if (!user || !bcrypt.compareSync(password, user.password)) {
+          return done(null, false, { message: "Invalid credentials" });
+        }
+        done(null, user);
+      })
+      .catch(err => {
+        done(err);
+      });
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Express View engine setup
 
@@ -51,8 +99,10 @@ app.locals.title = 'Express - Generated with IronGenerator';
 
 
 
-const index = require('./routes/index');
-app.use('/', index);
+app.use('/', require('./routes/index'));
+app.use('/', require('./routes/router'));
 
+app.use('/protected', require('./routes/protected'));
 
 module.exports = app;
+ 
